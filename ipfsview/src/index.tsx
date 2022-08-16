@@ -145,11 +145,18 @@ class Main extends React.Component<{}, iState> {
     }
   }
 
-  async reload() {
+  async sync() {
     if(!this.state.url || this.state.url.length == 0) return
     if(!this.state.peerId || this.state.peerId.length == 0) return
 
     const tableData = await this.loadTableData(this.state.url)
+
+    const cids = Object.keys(tableData)
+    for(const cid of cids) {
+      const message:PublishCid = {url: this.state.url, cid, from: this.state.peerId}
+      await this.ipfs.publish('PUBLISH_CID', JSON.stringify(message))
+    }
+
     this.setState({tableData}, async()=> {
       const message:RequestCids = {url: this.state.url, from: this.state.peerId}
       await this.ipfs.publish('REQUEST_CIDS', JSON.stringify(message))
@@ -232,7 +239,7 @@ class Main extends React.Component<{}, iState> {
         <br/>
         <div>url:{this.state.url}</div>
         <br/>
-        <button onClick={() => {this.reload()}} >reload</button>
+        <button onClick={() => {this.sync()}} >sync</button>
         <br/>
         {
           Object.keys(this.state.tableData).length > 0 && 
