@@ -33,6 +33,7 @@ class Main extends React.Component<{}, iState> {
   private datastore: Datastore
 
   private peerRef
+  private subscriberRef
   private inputRef
 
   constructor(state:iState) {
@@ -46,6 +47,7 @@ class Main extends React.Component<{}, iState> {
 
     this.inputRef = React.createRef()
     this.peerRef = React.createRef()
+    this.subscriberRef = React.createRef()
 
     this.onNativeMessage = this.onNativeMessage.bind(this)
     this.onPublishCid = this.onPublishCid.bind(this)
@@ -185,10 +187,15 @@ class Main extends React.Component<{}, iState> {
 
     setInterval(async() => {
       const peers = await this.ipfs.peers()
-
       this.peerRef.current.value = ""
       for (const peer of peers) {
         this.peerRef.current.value += peer.peer + "\n"
+      }
+
+      const subscribers = await this.ipfs.subscribers('PUBLISH_CID')
+      this.subscriberRef.current.value = ""
+      for (const subscriber of subscribers) {
+        this.subscriberRef.current.value += subscriber + '\n'
       }
     }, 1000)
   }
@@ -247,6 +254,10 @@ class Main extends React.Component<{}, iState> {
         <textarea ref={this.inputRef}></textarea>
         <br/>
         <button onClick={() => {this.addComment()}} >add comment</button>
+        <br/>
+        <br/>
+        <div>subscribers</div>
+        <textarea readOnly ref={this.subscriberRef} style={{width:'100%', height:'100vh'}}></textarea>
         <br/>
         <br/>
         <div>peers</div>

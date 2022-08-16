@@ -72,6 +72,11 @@ export default class Node {
   public async peers() {
     return await this.ipfs.swarm.peers()
   }
+
+  public async subscribers(topic:string) {
+    return await this.ipfs.pubsub.peers(topic)
+  }
+
   public async privKey() {
     const res:any = await this.ipfs.config.get('Identity')
     return res.PrivKey
